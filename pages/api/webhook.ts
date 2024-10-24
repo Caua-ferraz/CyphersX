@@ -68,6 +68,7 @@ export default async function webhookHandler(req: NextApiRequest, res: NextApiRe
 
     res.status(200).json({ received: true });
   } catch (error: any) {
+    // Log the error
     console.error('Error processing webhook event:', error.message);
     res.status(500).send('Internal Server Error');
   }
@@ -82,6 +83,7 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
   console.log('Processing checkout.session.completed event:', { uniqueUser, plan });
 
   if (!uniqueUser) {
+    console.error('Missing unique_user in session metadata');
     throw new Error('Missing unique_user in session metadata');
   }
 
@@ -90,7 +92,8 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
   endDate.setFullYear(endDate.getFullYear() + 100); // 'Pro' plan is forever (100 years)
 
   try {
-    const { data, error } = await supabase
+    // Insert into premium_subscriptions table
+    const { data: subscriptionData, error: subscriptionError } = await supabase
       .from('premium_subscriptions')
       .insert({
         id: session.id, // Use Stripe session ID as the 'id' field
@@ -103,18 +106,31 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
       })
       .select();
 
-    if (error) {
-      console.error(`Supabase insert failed: ${error.message}`);
-      throw new Error(`Supabase insert failed: ${error.message}`);
+    if (subscriptionError) {
+      console.error(`Supabase insert failed: ${subscriptionError.message}`);
+      throw new Error(`Supabase insert failed: ${subscriptionError.message}`);
     }
 
-    if (data.length === 0) {
+    if (subscriptionData.length === 0) {
       throw new Error(`No subscription inserted for unique_user: ${uniqueUser}`);
     }
 
     console.log(`Successfully created subscription for unique_user: ${uniqueUser}`);
+
+    // Update the profile in the 'profiles' table with active subscription
+    const { data: profileData, error: profileError } = await supabase
+      .from('profiles')  // Use the correct 'profiles' table
+      .update({ subscription_status: 'active' })  // Update with the appropriate status or field
+      .eq('unique_user', uniqueUser);  // Filter by 'unique_user'
+
+    if (profileError) {
+      console.error(`Supabase update failed for profiles: ${profileError.message}`);
+      throw new Error(`Supabase update failed for profiles: ${profileError.message}`);
+    }
+
+    console.log(`Successfully updated profile for unique_user: ${uniqueUser}`);
   } catch (err: any) {
-    console.error('Error interacting with Supabase:', err);
+    console.error('Error interacting with Supabase:', err.message);
     throw new Error(`Error interacting with Supabase: ${err.message}`);
   }
 }
