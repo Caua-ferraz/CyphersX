@@ -10,7 +10,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
 
 // Initialize Supabase client
 const supabase = createClient(
-  process.env.SUPABASE_URL as string,
+  process.env.NEXT_PUBLIC_SUPABASE_URL as string,
   process.env.SUPABASE_SERVICE_ROLE_KEY as string
 );
 
@@ -18,6 +18,8 @@ const supabase = createClient(
 export const config = {
   api: {
     bodyParser: false,
+    // Ensure the function runs in the Node.js runtime
+    // Remove or comment out any runtime configuration that sets 'edge'
   },
 };
 
@@ -58,43 +60,32 @@ export default async function webhookHandler(req: NextApiRequest, res: NextApiRe
       case 'checkout.session.completed':
         await handleCheckoutSessionCompleted(event.data.object as Stripe.Checkout.Session);
         break;
+      // Handle other event types as needed
       default:
         console.warn(`Unhandled event type: ${event.type}`);
     }
 
     res.status(200).json({ received: true });
   } catch (error: any) {
-    console.error('Error processing webhook event:', error);
-    res.status(500).send(`Internal Server Error: ${error.message}`);
+    console.error('Error processing webhook event:', error.message);
+    res.status(500).send('Internal Server Error');
   }
 }
 
 async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) {
-  // Retrieve the full session to get metadata
-  let fullSession: Stripe.Checkout.Session;
-  try {
-    fullSession = await stripe.checkout.sessions.retrieve(session.id);
-  } catch (err: any) {
-    console.error('Error retrieving Checkout Session:', err.message);
-    throw new Error(`Error retrieving Checkout Session: ${err.message}`);
-  }
-
-  const discordId = fullSession.metadata?.discord_id;
-  const plan = fullSession.metadata?.plan;
+  const discordId = session.metadata?.discord_id;
+  const plan = session.metadata?.plan;
 
   if (!discordId || !plan) {
-    console.error('Missing discord_id or plan in session metadata:', fullSession.metadata);
     throw new Error('Missing discord_id or plan in session metadata');
   }
 
-  // Update Supabase
   const { error } = await supabase
     .from('users')
     .update({ subscription_plan: plan, subscription_status: 'active' })
     .eq('discord_id', discordId);
 
   if (error) {
-    console.error('Supabase update failed:', error.message);
     throw new Error(`Supabase update failed: ${error.message}`);
   }
 
