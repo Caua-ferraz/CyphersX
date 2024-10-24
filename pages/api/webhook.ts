@@ -38,23 +38,27 @@ export default async function webhookHandler(req: NextApiRequest, res: NextApiRe
   }
 
   let event: Stripe.Event;
+  const sig = req.headers['stripe-signature'] as string;
 
   try {
+    // Ensure the signature exists
+    if (!sig) {
+      console.error('Missing stripe-signature header');
+      return res.status(400).send('Webhook Error: Missing stripe-signature header');
+    }
+
+    // Read the raw body
     const buf = await buffer(req);
-    const sig = req.headers['stripe-signature'] as string;
 
-    event = stripe.webhooks.constructEvent(
-      buf,
-      sig,
-      process.env.STRIPE_WEBHOOK_SECRET as string
-    );
-  } catch (err: any) {
-    console.error('Webhook signature verification failed:', err.message);
-    return res.status(400).send(`Webhook Error: ${err.message}`);
-  }
+    try {
+      // Verify the event by constructing it from the raw body and signature
+      event = stripe.webhooks.constructEvent(buf, sig, process.env.STRIPE_WEBHOOK_SECRET as string);
+    } catch (err: any) {
+      console.error('Webhook signature verification failed:', err.message);
+      return res.status(400).send(`Webhook Error: ${err.message}`);
+    }
 
-  // Process the checkout session completed event
-  try {
+    // Process the event
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object as Stripe.Checkout.Session;
       await handleCheckoutSessionCompleted(session);
@@ -81,7 +85,6 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
     throw new Error('Missing unique_user in session metadata');
   }
 
-  // Define start and end dates for the 'Pro' plan
   const startDate = new Date().toISOString();
   const endDate = new Date();
   endDate.setFullYear(endDate.getFullYear() + 100); // 'Pro' plan is forever (100 years)
