@@ -76,17 +76,24 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
   const discordId = session.metadata?.discord_id;
   const plan = session.metadata?.plan;
 
+  console.log('Processing checkout.session.completed event:', { discordId, plan });
+
   if (!discordId || !plan) {
     throw new Error('Missing discord_id or plan in session metadata');
   }
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('users')
     .update({ subscription_plan: plan, subscription_status: 'active' })
-    .eq('discord_id', discordId);
+    .eq('discord_id', discordId)
+    .select();
 
   if (error) {
     throw new Error(`Supabase update failed: ${error.message}`);
+  }
+
+  if (data.length === 0) {
+    throw new Error(`No user found with Discord ID: ${discordId}`);
   }
 
   console.log(`Successfully updated subscription for Discord ID: ${discordId}`);
