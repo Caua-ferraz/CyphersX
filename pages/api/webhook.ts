@@ -30,7 +30,7 @@ async function buffer(readable: Readable) {
   return Buffer.concat(chunks);
 }
 
-// Webhook handler function
+// Main webhook handler function
 export default async function webhookHandler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
@@ -42,6 +42,7 @@ export default async function webhookHandler(req: NextApiRequest, res: NextApiRe
   try {
     const buf = await buffer(req);
     const sig = req.headers['stripe-signature'] as string;
+
     event = stripe.webhooks.constructEvent(
       buf,
       sig,
@@ -70,27 +71,28 @@ export default async function webhookHandler(req: NextApiRequest, res: NextApiRe
 
 // Function to handle the 'checkout.session.completed' event
 async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) {
-  const discordId = session.metadata?.discord_id;
-  const plan = session.metadata?.plan;
+  const uniqueUser = session.metadata?.unique_user;
+  const plan = 'Pro'; // Since only 'Pro' is buyable
 
-  // Log the event to verify metadata
-  console.log('Processing checkout.session.completed event:', { discordId, plan });
+  // Log for debugging
+  console.log('Processing checkout.session.completed event:', { uniqueUser, plan });
 
-  if (!discordId || !plan) {
-    throw new Error('Missing discord_id or plan in session metadata');
+  if (!uniqueUser) {
+    throw new Error('Missing unique_user in session metadata');
   }
 
-  // Get the current date and calculate the end date (assuming 100 years for a long-term plan)
-  const startDate = new Date().toISOString(); // Current date
+  // Define start and end dates for the 'Pro' plan
+  const startDate = new Date().toISOString();
   const endDate = new Date();
-  endDate.setFullYear(endDate.getFullYear() + 100); // Set end date to 100 years later
+  endDate.setFullYear(endDate.getFullYear() + 100); // 'Pro' plan is forever (100 years)
 
   try {
     const { data, error } = await supabase
       .from('premium_subscriptions')
       .insert({
-        unique_user: discordId,
-        plan: plan,
+        id: session.id, // Use Stripe session ID as the 'id' field
+        unique_user: uniqueUser,
+        plan: plan, // Set plan as 'Pro'
         start_date: startDate,
         end_date: endDate.toISOString(),
         is_active: true,
@@ -104,10 +106,10 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
     }
 
     if (data.length === 0) {
-      throw new Error(`No user inserted with Discord ID: ${discordId}`);
+      throw new Error(`No subscription inserted for unique_user: ${uniqueUser}`);
     }
 
-    console.log(`Successfully updated subscription for Discord ID: ${discordId}`);
+    console.log(`Successfully created subscription for unique_user: ${uniqueUser}`);
   } catch (err: any) {
     console.error('Error interacting with Supabase:', err);
     throw new Error(`Error interacting with Supabase: ${err.message}`);
