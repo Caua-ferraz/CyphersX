@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { buffer } from 'micro';
 import Stripe from 'stripe';
+import { Readable } from 'stream';
 import { createClient } from '@supabase/supabase-js';
 
 // Initialize Stripe with your secret key and specify the API version
@@ -18,8 +18,19 @@ const supabase = createClient(
 export const config = {
   api: {
     bodyParser: false,
+    // Ensure the function runs in the Node.js runtime
+    // Remove or comment out any runtime configuration that sets 'edge'
   },
 };
+
+// Function to buffer the readable stream
+async function buffer(readable: Readable) {
+  const chunks: Uint8Array[] = [];
+  for await (const chunk of readable) {
+    chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
+  }
+  return Buffer.concat(chunks);
+}
 
 // Webhook handler function
 export default async function webhookHandler(req: NextApiRequest, res: NextApiResponse) {
@@ -35,7 +46,7 @@ export default async function webhookHandler(req: NextApiRequest, res: NextApiRe
     const sig = req.headers['stripe-signature'] as string;
 
     event = stripe.webhooks.constructEvent(
-      buf.toString(),
+      buf,
       sig,
       process.env.STRIPE_WEBHOOK_SECRET as string
     );
@@ -49,11 +60,7 @@ export default async function webhookHandler(req: NextApiRequest, res: NextApiRe
       case 'checkout.session.completed':
         await handleCheckoutSessionCompleted(event.data.object as Stripe.Checkout.Session);
         break;
-      // Handle issuing card shipment with a generic type or remove it if not supported
-      case 'issuing.card.shipment.created':
-        console.warn('issuing.card.shipment.created event not supported in current API version.');
-        break;
-      // Add more case handlers as needed
+      // Handle other event types as needed
       default:
         console.warn(`Unhandled event type: ${event.type}`);
     }
@@ -73,7 +80,7 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
     throw new Error('Missing discord_id or plan in session metadata');
   }
 
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from('users')
     .update({ subscription_plan: plan, subscription_status: 'active' })
     .eq('discord_id', discordId);
