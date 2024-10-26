@@ -72,6 +72,38 @@ export type Database = {
           }
         ]
       }
+      waitlist: {
+        Row: {
+          id: string
+          email: string
+          created_at: string
+          status: 'pending' | 'approved' | 'rejected'
+          notes: string | null
+        }
+        Insert: {
+          id?: string
+          email: string
+          created_at?: string
+          status?: 'pending' | 'approved' | 'rejected'
+          notes?: string | null
+        }
+        Update: {
+          id?: string
+          email?: string
+          created_at?: string
+          status?: 'pending' | 'approved' | 'rejected'
+          notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "waitlist_email_fkey"
+            columns: ["email"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["email"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never

@@ -20,6 +20,26 @@ const nextConfig = {
 			},
 		],
 	},
+	
+	async rewrites() {
+		return [
+			{
+				source: '/:path*',
+				destination: '/app/:path*',
+				has: [
+					{
+						type: 'host',
+						value: 'app.localhost:3000',
+					},
+				],
+			},
+			{
+				source: '/:path*',
+				destination: '/website/:path*',
+			},
+		];
+	},
+
 	async headers() {
 		return [
 			{

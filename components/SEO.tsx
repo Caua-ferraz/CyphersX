@@ -23,13 +23,13 @@ interface SEOProps {
  * Customize these values to match your SaaS application
  */
 const defaultMeta = {
-  title: 'BilQuick - Launch Your SaaS Faster',
-  description: 'BilQuick is the ultimate SaaS boilerplate. Build and launch your startup in days, not months. Next.js, React, Tailwind CSS, and more.',
+  title: 'Nexly - Launch Your SaaS Faster',
+  description: 'Nexly is the ultimate SaaS boilerplate. Build and launch your startup in days, not months. Next.js, React, Tailwind CSS, and more.',
   keywords: 'saas boilerplate, next.js template, react starter, tailwind css, supabase, stripe integration, rapid development',
-  ogImage: '/og-image-bilquick.png',
+  ogImage: '/og-image-nexly.png',
   ogType: 'website' as const,
   twitterCard: 'summary_large_image' as const,
-  canonicalUrl: 'https://bilquick.com',
+  canonicalUrl: 'https://nexly.com',
 };
 
 /**
@@ -51,30 +51,29 @@ export function generateMetadata({
   publishedTime,
   modifiedTime,
 }: SEOProps): Metadata {
-  const metaTitle = title === defaultMeta.title ? title : `${title} | BilQuick`;
+  const metaTitle = title === defaultMeta.title ? title : `${title} | Nexly`;
 
   return {
     title: metaTitle,
     description,
     keywords: keywords?.split(',').map(keyword => keyword.trim()), // Converts keywords to an array
-    authors: author ? [{ name: author }] : [{ name: 'BilQuick Team' }],
+    authors: author ? [{ name: author }] : [{ name: 'Nexly Team' }],
     openGraph: {
       title: metaTitle,
       description,
       type: ogType as 'article' | 'website', // Explicitly cast to allowed types
       images: [{ url: ogImage || defaultMeta.ogImage, width: 1200, height: 630, alt: metaTitle }],
-      siteName: 'BilQuick',
+      siteName: 'Nexly',
     },
     twitter: {
       card: twitterCard,
       title: metaTitle,
       description,
       images: ogImage ? [ogImage] : undefined,
-      creator: '@BilQuickHQ',
+      creator: '@NexlyHQ',
     },
     icons: {
       icon: '/favicon.ico',
-      apple: '/apple-touch-icon.png',
     },
     metadataBase: new URL(canonicalUrl || defaultMeta.canonicalUrl),
     alternates: {

@@ -98,14 +98,29 @@ export function CardContent({ children, className }: CardContentProps) {
 	return <div className={cn("p-4", className)}>{children}</div>;
 }
 
+// Add CardDescription component
+interface CardDescriptionProps {
+	children: React.ReactNode;
+	className?: string;
+}
+
+export function CardDescription({ children, className }: CardDescriptionProps) {
+	return <p className={cn("text-sm text-muted-foreground", className)}>{children}</p>;
+}
+
+// Add CardFooter component
+interface CardFooterProps {
+	children: React.ReactNode;
+	className?: string;
+}
+
+export function CardFooter({ children, className }: CardFooterProps) {
+	return <div className={cn("p-4 border-t", className)}>{children}</div>;
+}
+
 // Customization options:
 
-// 1. Add a CardFooter component
-// export function CardFooter({ children, className }: CardHeaderProps) {
-//   return <div className={cn("p-4 border-t", className)}>{children}</div>;
-// }
-
-// 2. Implement card variants
+// 1. Implement card variants
 // You can create a variants object similar to the button component:
 // const cardVariants = cva("rounded-lg", {
 //   variants: {

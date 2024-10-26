@@ -1,0 +1,203 @@
+/* styles/globals.css */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Light Mode Variables */
+    --background: 215 25% 27%; /* slate-700 */
+    --foreground: 0 0% 100%; /* white */
+    --card: 215 25% 30%; /* slightly lighter than background */
+    --card-darker: 215 25% 35%; /* reduced contrast */
+    --popover: 215 25% 32%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 160 84% 39%; /* emerald-400 */
+    --primary-foreground: 215 25% 27%; /* slate-700 */
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 45 93% 47%; /* amber-400 */
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+    --radius: 0.5rem;
+    --spacing-unit: 0.25rem;
+    /* Removed --card-darker definition as it's now in hsl(var(--card-darker)) */
+    --color-1: 0 100% 63%;
+    --color-2: 270 100% 63%;
+    --color-3: 210 100% 63%;
+    --color-4: 195 100% 63%;
+    --color-5: 90 100% 63%;
+  }
+  .dark {
+    /* Dark Mode Variables */
+    --background: 215 25% 27%; /* slate-700 */
+    --foreground: 0 0% 100%; /* white */
+    --card: 215 25% 30%;
+    --card-darker: 215 25% 35%;
+    --popover: 215 25% 32%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 160 84% 39%; /* emerald-400 */
+    --primary-foreground: 215 25% 27%; /* slate-700 */
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 45 93% 47%; /* amber-400 */
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 48%;
+    --radius: 0.5rem;
+    --spacing-unit: 0.25rem;
+    --card-darker: 215 25% 35%; /* adjusted for dark mode */ --color-1: 0 100% 63%; --color-2: 270 100% 63%; --color-3: 210 100% 63%; --color-4: 195 100% 63%; --color-5: 90 100% 63%;
+  }
+}
+
+@layer base {
+  /* Apply border color */
+  {
+    @apply border-border;
+  }
+  
+  /* Apply background and text colors to body */
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+
+  /* Apply font styles to headings */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold tracking-tight;
+  }
+}
+
+.card {
+  @apply bg-card text-card-foreground rounded-lg shadow-md p-6 relative overflow-hidden;
+  /* Updated gradient to use adjusted colors */
+}
+
+.glowBox {
+  position: absolute;
+  top: calc(50% - 20px);
+  left: calc(50% - 20px);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #fff;
+  box-shadow: 0 0 60px 30px #fff, 0 0 100px 60px #f0f, 0 0 140px 90px #0ff;
+}
+
+@layer utilities {
+  .bg-gradient-to-r {
+    background-image: linear-gradient(to right, var(--tw-gradient-stops));
+  }
+  .from-primary {
+    --tw-gradient-from: hsl(var(--primary));
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(var(--primary), 0));
+  }
+  .to-accent {
+    --tw-gradient-to: hsl(var(--accent));
+  }
+  
+  /* Spacing Utilities */
+  .space-y-1 { margin-top: calc(1 * var(--spacing-unit)); }
+  .space-y-2 { margin-top: calc(2 * var(--spacing-unit)); }
+  .space-y-4 { margin-top: calc(4 * var(--spacing-unit)); }
+  
+  /* Icon Utility */
+  .icon {
+    @apply w-6 h-6 inline-block;
+  }
+
+  /* Card Utility */
+  .card {
+    @apply bg-card text-card-foreground rounded-lg shadow-md p-6;
+  }
+}
+
+/* Custom styles for the logo */
+.logo {
+  @apply font-bold text-2xl text-primary;
+}
+
+/* Custom styles for minimalist buttons */
+.btn {
+  @apply px-4 py-2 rounded-md transition-colors duration-200;
+}
+.btn-primary {
+  @apply bg-primary text-primary-foreground hover:bg-primary/90;
+}
+.btn-secondary {
+  @apply bg-secondary text-secondary-foreground hover:bg-secondary/90;
+}
+
+/* Custom styles for data visualization elements */
+.data-node {
+  @apply w-4 h-4 rounded-full bg-accent;
+}
+.data-line {
+  @apply h-px bg-border;
+}
+
+.bg-black-dots {
+  background-image: radial-gradient(circle, #000000 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
+}
+
+.cursor-grab {
+  cursor: grab;
+}
+
+.cursor-grabbing {
+  cursor: grabbing;
+}
+
+.subtleGlow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%; /* Ajustado para 100% do Card */
+  height: 100%; /* Ajustado para 100% do Card */
+  border-radius: inherit;
+  background-color: transparent;
+  box-shadow: 
+    0 0 60px 30px rgba(0, 0, 255, 0.3), 
+    0 0 90px 45px rgba(0, 0, 255, 0.3), 
+    0 0 120px 60px rgba(0, 0, 255, 0.3);
+  z-index: -1; /* Mantém o glow atrás do conteúdo do Card */
+  pointer-events: none;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+
+
