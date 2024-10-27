@@ -6,12 +6,6 @@ import dynamic from 'next/dynamic';
 import Footer from "@/components/Footer";
 
 // Dynamic imports
-const WaitlistForm = dynamic(() => import("@/components/WaitlistForm"), {
-  loading: () => <div>Loading...</div>
-});
-const FlowChart = dynamic(() => import("@/components/flow"), {
-  loading: () => <div>Loading...</div>
-});
 const Price = dynamic(() => import("@/components/subscription/price"), {
   loading: () => <div>Loading...</div>
 });
