@@ -2,19 +2,20 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useUser } from "@/app/hook/useUser";
+import useUser from "@/app/hook/useUser";
 import { useRouter } from "next/navigation";
 import { checkout } from "@/lib/actions/stripe";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { cn } from "@/lib/utils";
-import { loadStripe } from '@stripe/stripe-js';
+import LazyLoad from "@/components/LazyLoad";
+import { Stripe, loadStripe } from '@stripe/stripe-js';
 
 interface CheckoutProps {
     priceId: string;
 }
 
 export default function Checkout({ priceId }: CheckoutProps) {
-    const { user } = useUser();
+    const { data: user } = useUser();
     const router = useRouter();
     const [loading, setLoading] = useState(false);
 
@@ -48,18 +49,20 @@ export default function Checkout({ priceId }: CheckoutProps) {
     };
 
     return (
-        <Button
-            className="w-full flex items-center gap-2"
-            onClick={handleCheckout}
-            disabled={loading}
-        >
-            Getting Started{" "}
-            <AiOutlineLoading3Quarters
-                className={cn("animate-spin", loading ? "block" : "hidden")}
-            />
-        </Button>
+        <LazyLoad>
+            <Button
+                className="w-full flex items-center gap-2"
+                onClick={handleCheckout}
+            >
+                Getting Started{" "}
+                <AiOutlineLoading3Quarters
+                    className={cn("animate-spin", loading ? "block" : "hidden")}
+                />
+            </Button>
+        </LazyLoad>
     );
 }
+
 
 // Usage example:
 // <Checkout priceId="price_1234567890" />
