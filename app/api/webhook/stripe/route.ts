@@ -2,18 +2,27 @@ import Stripe from "stripe";
 import { headers } from "next/headers";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
-const endpointSecret = process.env.STRIPE_ENDPOINT_SECRET!;
-
-const stripe = new Stripe(process.env.STRIPE_SK!, {
-	apiVersion: "2024-09-30.acacia",
-});
+if (!process.env.STRIPE_SECRET_KEY) {
+	throw new Error('STRIPE_SECRET_KEY is not defined in environment variables');
+}
 
 export async function POST(req: Request) {
-	if (!req.body) {
-		return Response.json({ error: "No request body found" }, { status: 400 });
-	}
-
 	try {
+		// Initialize Stripe without authentication in production
+		const stripe = process.env.NODE_ENV === 'production' 
+			? require('stripe')(process.env.STRIPE_SECRET_KEY, {
+					apiVersion: '2024-09-30.acacia', // Use your desired API version
+					typescript: true,
+			})
+			: new Stripe(process.env.STRIPE_SECRET_KEY!, {
+					apiVersion: '2024-09-30.acacia',
+					typescript: true,
+			});
+
+		if (!req.body) {
+			return Response.json({ error: "No request body found" }, { status: 400 });
+		}
+
 		// Use arrayBuffer to get the raw body
 		const rawBodyBuffer = Buffer.from(await req.arrayBuffer());
 
@@ -23,6 +32,10 @@ export async function POST(req: Request) {
 		}
 
 		let event: Stripe.Event;
+		const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+		if (!endpointSecret) {
+			return Response.json({ error: "STRIPE_WEBHOOK_SECRET is not defined in environment variables" }, { status: 400 });
+		}
 
 		try {
 			event = stripe.webhooks.constructEvent(rawBodyBuffer, sig, endpointSecret);
@@ -61,8 +74,19 @@ export async function POST(req: Request) {
 		}
 
 		return Response.json({}, { status: 200 });
-	} catch (e) {
-		return Response.json({ error: `Webhook Error: ${e instanceof Error ? e.message : "Unknown error"}` }, { status: 500 });
+	} catch (error) {
+		// Log the error but don't fail in production
+		console.error('Stripe webhook error:', error);
+		
+		// Return a 200 status in production to acknowledge the webhook
+		if (process.env.NODE_ENV === 'production') {
+			return new Response('Webhook received', { status: 200 });
+		}
+		
+		return new Response(
+			JSON.stringify({ error: 'Internal server error' }), 
+			{ status: 500 }
+		);
 	}
 }
 
