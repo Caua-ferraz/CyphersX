@@ -1,6 +1,6 @@
 import React from 'react';
 import { calculatePositions, generatePath } from './ui/flowUtils';
-import { Step, Position } from './types/flowTypes';
+import { Step } from './types/flowTypes';
 
 const FlowStep: React.FC<{ step: Step }> = ({ step }) => {
   return (

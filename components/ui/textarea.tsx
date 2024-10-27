@@ -2,7 +2,6 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
-
 export interface TextareaProps
   extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onResize'> {
   className?: string;
@@ -11,10 +10,23 @@ export interface TextareaProps
   maxCount?: number;
   onResize?: (height: number) => void;
   onTouchStart?: (e: React.TouchEvent<HTMLTextAreaElement>) => void;
+  onInput?: (event: React.FormEvent<HTMLTextAreaElement>) => void; // Added onInput to props
 }
 
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ className, error, label, maxCount, onResize, onTouchStart, ...props }, ref) => {
+  (
+    {
+      className,
+      error,
+      label,
+      maxCount,
+      onResize,
+      onTouchStart,
+      onInput, // Destructure onInput
+      ...props
+    },
+    ref
+  ) => {
     const textareaId = React.useId();
     const [charCount, setCharCount] = React.useState(0);
     const textareaRef = React.useRef<HTMLTextAreaElement>(null);
@@ -32,28 +44,31 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
       [onResize]
     );
 
-    const handleInput = React.useCallback((event: React.FormEvent<HTMLTextAreaElement>) => {
-      const textarea = event.currentTarget;
-      setCharCount(textarea.value.length);
+    const handleInput = React.useCallback(
+      (event: React.FormEvent<HTMLTextAreaElement>) => {
+        const textarea = event.currentTarget;
+        setCharCount(textarea.value.length);
 
-      if (onResize) {
-        requestAnimationFrame(() => {
-          textarea.style.height = 'auto';
-          const newHeight = textarea.scrollHeight;
-          textarea.style.height = `${newHeight}px`;
-          debouncedResize(newHeight);
-        });
-      }
+        if (onResize) {
+          requestAnimationFrame(() => {
+            textarea.style.height = 'auto';
+            const newHeight = textarea.scrollHeight;
+            textarea.style.height = `${newHeight}px`;
+            debouncedResize(newHeight);
+          });
+        }
 
-      if (props.onInput) {
-        props.onInput(event);
-      }
-    }, [onResize, props.onInput, debouncedResize]);
+        if (onInput) {
+          onInput(event);
+        }
+      },
+      [onResize, onInput, debouncedResize] // Updated dependencies
+    );
 
     React.useEffect(() => {
       if (textareaRef.current && onResize) {
         const resizeObserver = new ResizeObserver((entries) => {
-          for (let entry of entries) {
+          for (const entry of entries) { // Changed 'let' to 'const'
             debouncedResize(entry.contentRect.height);
           }
         });
@@ -72,23 +87,18 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     const memoizedCharCountDisplay = React.useMemo(() => {
       if (!maxCount) return null;
       return (
-        <p className={cn(
-          "text-sm text-gray-500",
-          charCount > maxCount && "text-red-500"
-        )}>
+        <p
+          className={cn(
+            "text-sm text-gray-500",
+            charCount > maxCount && "text-red-500"
+          )}
+        >
           {charCount}/{maxCount}
         </p>
       );
     }, [charCount, maxCount]);
 
-    const [isMobile, setIsMobile] = React.useState(false);
-
-    React.useEffect(() => {
-      const checkMobile = () => setIsMobile(window.innerWidth < 768);
-      checkMobile();
-      window.addEventListener('resize', checkMobile);
-      return () => window.removeEventListener('resize', checkMobile);
-    }, []);
+    // Removed isMobile since it's not used.
 
     return (
       <div className="relative">

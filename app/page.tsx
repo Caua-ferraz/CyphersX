@@ -1,7 +1,5 @@
 import React from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { FaRocket, FaChartLine, FaCogs, FaLinkedin, FaInstagram, FaDatabase, FaMobileAlt, FaChartPie } from 'react-icons/fa';
+import { FaRocket, FaChartLine, FaCogs, FaDatabase, FaMobileAlt, FaChartPie } from 'react-icons/fa';
 import { generateMetadata } from "@/components/SEO";
 import type { Metadata } from 'next';
 import dynamic from 'next/dynamic';

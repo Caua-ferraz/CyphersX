@@ -8,7 +8,7 @@ import { checkout } from "@/lib/actions/stripe";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { cn } from "@/lib/utils";
 import LazyLoad from "@/components/LazyLoad";
-import { Stripe, loadStripe } from '@stripe/stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
 
 interface CheckoutProps {
     priceId: string;
@@ -127,3 +127,6 @@ export default function Checkout({ priceId }: CheckoutProps) {
 // trackEvent("checkout_initiated", { priceId });
 
 // Remember to adjust import statements if you move this component or add new dependencies.
+
+
+

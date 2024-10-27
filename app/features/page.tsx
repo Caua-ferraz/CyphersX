@@ -5,7 +5,6 @@ import { generateMetadata } from "@/components/SEO";
 import type { Metadata } from 'next';
 import LazyLoad from "@/components/LazyLoad";
 import TypingTitle from "@/components/TypingTitle";
-import CTASection from "@/components/cta";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = generateMetadata({
@@ -159,7 +158,7 @@ export default function FeaturesPage() {
           <div className="container mx-auto px-4 text-center">
             <h2 className="text-3xl font-bold mb-6">Supercharge Your Lead Generation</h2>
             <p className="text-xl mb-8">
-              We're here to help you generate leads and automate your workflows. With DataConnect Pro, you'll streamline your client acquisition process and boost your business growth like never before.
+              We&apos;re here to help you generate leads and automate your workflows. With DataConnect Pro, you&apos;ll streamline your client acquisition process and boost your business growth like never before.
             </p>
             <a href="#" className="bg-yellow-500 text-white font-semibold py-2 px-6 rounded-full hover:bg-opacity-90 transition-colors duration-300">
               Start Generating Leads

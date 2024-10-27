@@ -53,6 +53,8 @@ export function generateMetadata({
 }: SEOProps): Metadata {
   const metaTitle = title === defaultMeta.title ? title : `${title} | Nexly`;
 
+  const localeValue = locale || 'en-US';
+
   return {
     title: metaTitle,
     description,
@@ -64,6 +66,7 @@ export function generateMetadata({
       type: ogType as 'article' | 'website', // Explicitly cast to allowed types
       images: [{ url: ogImage || defaultMeta.ogImage, width: 1200, height: 630, alt: metaTitle }],
       siteName: 'Nexly',
+      locale: localeValue,
     },
     twitter: {
       card: twitterCard,
@@ -253,3 +256,4 @@ export function generateMetadata({
 
 // Remember, SEO is an ongoing process. Continuously monitor your performance,
 // adapt to algorithm changes, and refine your strategy based on results.
+

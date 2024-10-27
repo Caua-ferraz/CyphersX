@@ -3,11 +3,7 @@ import { Button } from "@/components/ui/button";
 import { manageBilling } from "@/lib/actions/stripe";
 import { FaDiscord } from "react-icons/fa";
 
-interface DashboardContentProps {
-  user: any;
-}
-
-export default function DashboardContent({ user }: DashboardContentProps) {
+export default function DashboardContent({ user }: { user: any }) {
   const handleBilling = async () => {
     if (user?.subscription?.customer_id) {
       try {

@@ -1,12 +1,10 @@
 import React from "react";
-import Image from "next/image";
 import { FaUsers, FaHandshake, FaLightbulb, FaHeart } from 'react-icons/fa';
 import { generateMetadata } from "@/components/SEO";
 import type { Metadata } from 'next';
 import LazyLoad from "@/components/LazyLoad";
 import { Card, CardTitle, CardContent } from "@/components/ui/card";
 import FadeIn from "@/components/fadein";
-import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = generateMetadata({
