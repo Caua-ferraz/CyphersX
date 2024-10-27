@@ -23,8 +23,8 @@ const initUser = {
 	},
 };
 
-export const useUser = () => {
-	const { data: user, isLoading, error } = useQuery({
+export default function useUser() {
+	return useQuery({
 		queryKey: ["user"],
 		queryFn: async () => {
 			const supabase = supabaseBrowser();
@@ -76,13 +76,5 @@ export const useUser = () => {
 			}
 			return null;
 		},
-		retry: false, // Don't retry on error
-		staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
 	});
-
-	return {
-		user,
-		isLoading,
-		error
-	};
-};
+}
