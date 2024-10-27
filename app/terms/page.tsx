@@ -1,6 +1,5 @@
 import React from 'react';
 import FadeIn from "@/components/fadein";
-import TypingTitle from "@/components/TypingTitle";
 import Footer from "@/components/Footer";
 import LazyLoad from '@/components/LazyLoad';
 
@@ -84,7 +83,7 @@ export default function TermsOfServicePage() {
     <div className="min-h-screen bg-background flex flex-col items-center text-foreground">
       <section className="w-full max-w-4xl mx-auto px-4 py-12 space-y-8">
         <FadeIn>
-          <TypingTitle preText="Our " highlightedText="Terms of Service" />
+          <h1 className="text-2xl md:text-3xl font-semibold text-foreground">Our Terms of Service</h1>
         </FadeIn>
 
         <FadeIn>

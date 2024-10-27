@@ -4,7 +4,6 @@ import { FaRocket, FaChartLine, FaCogs, FaDatabase, FaMobileAlt, FaChartPie } fr
 import { generateMetadata } from "@/components/SEO";
 import type { Metadata } from 'next';
 import LazyLoad from "@/components/LazyLoad";
-import TypingTitle from "@/components/TypingTitle";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = generateMetadata({
@@ -86,10 +85,7 @@ export default function FeaturesPage() {
         <section className="py-20 bg-gradient-to-b from-background to-background/80 relative overflow-hidden">
           <div className="container mx-auto px-4 flex items-center relative z-10">
             <div className="w-2/3 pr-8">
-              <TypingTitle 
-                preText="Powerful " 
-                highlightedText="Features"
-              />
+              <h1 className="text-3xl font-bold mb-4">Powerful Features</h1>
               <p className="text-xl mt-6 mb-8">
                 Discover how DataConnect Pro empowers your B2B growth with cutting-edge features designed for modern client acquisition.
               </p>
