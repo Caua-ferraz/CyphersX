@@ -1,27 +1,11 @@
 "use client";
 import { supabaseBrowser } from "@/lib/supabase/browser";
 import { useQuery } from "@tanstack/react-query";
-import React from "react";
 
 // Helper function to sanitize input
 function sanitizeInput(input: string): string {
 	return input.replace(/[^\w\s@.-]/gi, '');
 }
-
-const initUser = {
-	created_at: "",
-	display_name: "",
-	email: "",
-	id: "",
-	image_url: "",
-	subscription: {
-		created_at: "",
-		customer_id: "",
-		email: "",
-		end_at: "",
-		subscription_id: "",
-	},
-};
 
 export default function useUser() {
 	return useQuery({
